@@ -1,6 +1,6 @@
 {
   "name": "@topvisor/n8n-nodes-telegram-send-message-custom",
-  "version": "1.0.0-dev",
+  "version": "1.0.0",
   "description": "Telegram Send Message with custom JSON",
   "author": "Artemeey",
   "license": "MIT",

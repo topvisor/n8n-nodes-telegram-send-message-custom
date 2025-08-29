@@ -1,6 +1,6 @@
 {
   "name": "@topvisor/n8n-nodes-telegram-send-message-custom",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Telegram Send Message with custom JSON",
   "author": "Artemeey",
   "license": "MIT",
@@ -10,12 +10,19 @@
     "community node"
   ],
   "n8n": {
-    "n8nNodes": [
+    "nodes": [
       "dist/TelegramSendMessageCustom.node.js"
     ]
   },
   "scripts": {
-    "build": "tsc && cp src/telegram.svg dist/telegram.svg && cp README.md dist/README.md"
+    "build": "tsc && cp src/telegram.svg dist/telegram.svg",
+    "publish": "npm run build && npm publish --access public"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",

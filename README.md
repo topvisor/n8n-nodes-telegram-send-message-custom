@@ -38,8 +38,8 @@ For example, adding custom `reply_markup` in JSON (inline keyboard, reply keyboa
 
 ## ⚙️ Install
 
-In n8n:
-**Settings → Community Nodes → Install → `n8n-nodes-telegram-send-message-custom`**
+In n8n:  
+**Settings → Community Nodes → Install → `@topvisor/n8n-nodes-telegram-send-message-custom`**
 
 ---
 

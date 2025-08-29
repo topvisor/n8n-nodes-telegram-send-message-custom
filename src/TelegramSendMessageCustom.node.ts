@@ -21,7 +21,7 @@ export class TelegramSendMessageCustom implements INodeType {
                 displayName: 'Custom JSON',
                 name: 'customJson',
                 type: 'json',
-                default: {},
+                default: '{}',
                 description: 'Custom JSON object will be added to the request body',
                 hint: `Example: { "reply_markup": { "inline_keyboard": [[{ "text": "Open site", "url": "https://example.com" }], [{ "text": "Run callback", "callback_data": "do_action" }]] }}`,
             }

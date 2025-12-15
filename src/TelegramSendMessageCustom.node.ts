@@ -15,8 +15,30 @@ export class TelegramSendMessageCustom implements INodeType {
         outputs: [NodeConnectionType.Main],
         credentials: [{name: 'telegramApi', required: true}],
         properties: [
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				default: 'sendMessage',
+				options: [
+					{name: 'Send Message', value: 'sendMessage'},
+					{name: 'Send Photo', value: 'sendPhoto'}
+				]
+			},
             {displayName: 'Chat ID', name: 'chatId', type: 'string', default: ''},
             {displayName: 'Text', name: 'text', type: 'string', default: ''},
+			{
+				displayName: 'Photo URL or File ID',
+				name: 'photo',
+				type: 'string',
+				default: '',
+				displayOptions: {
+					show: {
+						operation: ['sendPhoto']
+					}
+				},
+				description: 'Public URL or existing Telegram file_id for sendPhoto'
+			},
             {
                 displayName: 'Custom JSON',
                 name: 'customJson',
@@ -34,38 +56,48 @@ export class TelegramSendMessageCustom implements INodeType {
         const token = creds.accessToken
         const results: Array<{ json: IDataObject }> = []
 
-        for (let i = 0; i < items.length; i++) {
-            const chatId = this.getNodeParameter('chatId', i) as string
-            const text = this.getNodeParameter('text', i) as string
-            let customJson = this.getNodeParameter('customJson', i) as IDataObject | string
+		for (let i = 0; i < items.length; i++) {
+			const operation = this.getNodeParameter('operation', i) as string;
+			const chatId = this.getNodeParameter('chatId', i) as string;
+			const text = this.getNodeParameter('text', i) as string;
+			const photo = this.getNodeParameter('photo', i, '') as string;
+			const customJson = this.getNodeParameter('customJson', i) as IDataObject | string;
 
-            let customJsonObjectr: Record<string, any>;
+			let customJsonObject: Record<string, any>;
 
-            if (typeof customJson === 'string') {
-                try {
-                    customJsonObjectr = JSON.parse(customJson)
-                } catch {
-                    throw new Error('Custom JSON must be valid JSON')
-                }
-            } else {
-                customJsonObjectr = customJson;
-            }
+			if (typeof customJson === 'string') {
+				try {
+					customJsonObject = JSON.parse(customJson);
+				} catch {
+					throw new Error('Custom JSON must be valid JSON');
+				}
+			} else {
+				customJsonObject = customJson;
+			}
 
-            let body: IDataObject = {chat_id: chatId, text}
+			let body: IDataObject;
 
-            if (Object.keys(customJson).length > 0) {
-                body = {...body, ...customJsonObjectr}
-            }
+			if (operation === 'sendPhoto') {
+				body = {chat_id: chatId, photo};
+				if (text)
+					(body as any).caption = text;
+			} else {
+				body = {chat_id: chatId, text};
+			}
 
-            const res = await this.helpers.httpRequest({
-                method: 'POST',
-                url: `https://api.telegram.org/bot${token}/sendMessage`,
-                body,
-                json: true
-            })
+			if (Object.keys(customJsonObject).length > 0) {
+				body = {...body, ...customJsonObject};
+			}
 
-            results.push({json: {request: body, response: res as IDataObject}})
-        }
+			const res = await this.helpers.httpRequest({
+				method: 'POST',
+				url: `https://api.telegram.org/bot${token}/${operation}`,
+				body,
+				json: true
+			});
+
+			results.push({json: {request: body, response: res as IDataObject}});
+		}
 
         return this.prepareOutputData(results)
     }
